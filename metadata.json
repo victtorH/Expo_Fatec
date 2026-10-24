@@ -1,0 +1,6 @@
+{
+  "name": "Lógica de Papel",
+  "description": "Jogo de lógica digital com circuitos em papel, clipes como chaves e lâmpadas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

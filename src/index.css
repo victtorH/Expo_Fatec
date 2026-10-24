@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Patrick Hand', 'Kalam', cursive, sans-serif;
+    color: #1f2937;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+.font-kalam {
+  font-family: 'Kalam', cursive, sans-serif;
+}
+
+.font-hand {
+  font-family: 'Patrick Hand', cursive, sans-serif;
+}
+
+.font-caveat {
+  font-family: 'Caveat', cursive, sans-serif;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Notebook ruled paper background */
+.notebook-ruled-bg {
+  background-color: #faf7ee;
+  background-image: 
+    linear-gradient(90deg, transparent 59px, #fca5a5 59px, #fca5a5 61px, transparent 61px),
+    linear-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 100% 100%, 100% 32px;
+  background-position: 0 0, 0 16px;
+}
+
+/* Masking tape effect */
+.masking-tape {
+  background: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), inset 0 0 2px rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(220, 220, 210, 0.4);
+}
+
+/* Rough sketched paper border */
+.sketch-border {
+  border-style: solid;
+  border-color: #374151;
+  border-width: 2px;
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+}

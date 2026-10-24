@@ -1,0 +1,681 @@
+# DESENVOLVIMENTO DO JOGO LÓGICA DE PAPEL — ESPECIFICAÇÃO PARA IMPLEMENTAÇÃO
+
+## 1. PAPEL E RESPONSABILIDADE
+
+Atue como um engenheiro de software sênior especializado em desenvolvimento de jogos web, interfaces interativas, lógica digital, React, TypeScript, engenharia de requisitos e design de experiência do usuário (UX/UI).
+
+Sua responsabilidade é implementar uma versão jogável, funcional e visualmente fiel do jogo **Lógica de Papel**, utilizando como fontes obrigatórias:
+
+1. A documentação funcional `Lógica de Papel — Documentação Funcional Consolidada, versão 3.0`, anexada a esta solicitação.
+2. A imagem de referência visual anexada a esta solicitação.
+
+Não entregue somente uma descrição, um protótipo estático, uma imagem ilustrativa ou uma tela sem funcionalidades. Desenvolva a aplicação dentro do Google AI Studio Build mode, gere os arquivos necessários, disponibilize a pré-visualização executável e verifique o funcionamento do jogo.
+
+## 2. OBJETIVO DO PROJETO
+
+Desenvolver o jogo single-player **Lógica de Papel**, no qual o jogador controla clipes que funcionam como chaves em caminhos de circuitos elétricos e lógicos.
+
+O objetivo de cada fase é configurar os clipes para que o resultado lógico final corresponda à missão apresentada: acender ou apagar uma lâmpada.
+
+O jogo deverá combinar:
+
+- Interação direta com os circuitos.
+- Representação visual de conexões e desconexões.
+- Portas lógicas digitais.
+- Progressão por 15 fases.
+- Validação explícita da solução.
+- Sistema de erros, penalidades, corações e recompensas.
+- Cronômetro por fase.
+- Dicas educativas.
+- Pontuação e ranking.
+- Identidade visual baseada na imagem de referência.
+
+A implementação deve priorizar a correção das regras funcionais, a consistência visual, a clareza da interação e a facilidade de manutenção do código.
+
+## 3. HIERARQUIA DAS FONTES E CONTROLE DE INVENÇÕES
+
+Esta seção é obrigatória e prevalece sobre qualquer decisão criativa da implementação.
+
+### 3.1 Autoridade das fontes
+
+Utilize a documentação funcional como fonte de verdade para as regras do jogo.
+
+Utilize a imagem anexada como referência para a apresentação visual, incluindo, quando identificáveis:
+
+- Composição da tela.
+- Organização dos elementos.
+- Posicionamento dos circuitos.
+- Formato e aparência dos clipes.
+- Representação da fonte de energia e da lâmpada.
+- Estilo das portas lógicas.
+- Paleta de cores.
+- Tipografia.
+- Bordas, texturas, sombras e iluminação.
+- Botões, indicadores e demais elementos de interface.
+- Hierarquia visual e espaçamentos.
+
+A imagem orienta a aparência. A documentação orienta o comportamento funcional.
+
+Se uma informação visual parecer contradizer uma regra funcional, preserve a regra da documentação.
+
+Não copie erros de comportamento que eventualmente existam na imagem de referência.
+
+### 3.2 Não invente requisitos
+
+A documentação distingue informações definidas e pendentes.
+
+Respeite essa distinção durante toda a implementação.
+
+**Regras definidas:** devem ser implementadas conforme documentadas.
+
+**Regras pendentes:** não podem ser apresentadas como decisões aprovadas. Quando uma implementação provisória for indispensável para produzir um protótipo jogável, ela deverá:
+
+1. Ser identificada como provisória.
+2. Ficar isolada em uma configuração ou módulo facilmente modificável.
+3. Ser registrada em um arquivo `PENDENCIAS.md`.
+4. Não alterar silenciosamente os requisitos funcionais.
+5. Ser descrita no relatório final.
+
+Não invente autenticação, multiplayer, backend remoto, banco de dados, contas, sincronização, salvamento entre sessões, conquistas, moedas, áudio, pause ou qualquer funcionalidade adicional sem necessidade documentada.
+
+Não invente textos de regras, instruções educativas ou dicas específicas como se tivessem sido aprovados pelo responsável pelo produto.
+
+Se a imagem não estiver acessível para análise, não afirme que examinou seus elementos. Informe a limitação e não invente características visuais específicas.
+
+## 4. DIRETRIZES DE DESIGN E EXPERIÊNCIA
+
+A imagem de referência deve orientar a identidade visual da aplicação.
+
+Antes de implementar a interface, analise visualmente a imagem anexada e identifique os elementos relevantes para reproduzir sua composição.
+
+Priorize a fidelidade à referência em vez de substituir o design por um modelo genérico de jogo.
+
+Não introduza uma identidade visual independente que descaracterize a imagem.
+
+A interface deverá ser:
+
+- Coerente com a referência anexada.
+- Clara durante a resolução dos circuitos.
+- Visualmente organizada, sem excesso de informações desnecessárias.
+- Responsiva para diferentes larguras de tela.
+- Consistente entre tela inicial, partida e ranking.
+- Capaz de comunicar visualmente os estados aberto, fechado, correto, incorreto, aceso e apagado.
+
+Os elementos interativos devem oferecer feedback visual perceptível.
+
+Os clipes precisam demonstrar claramente seu estado atual. A lâmpada deve indicar se está acesa ou apagada. As conexões devem permitir compreender visualmente quais caminhos estão conectados.
+
+Se a referência utilizar elementos de papel, circuitos desenhados ou aparência artesanal, preserve essas características em vez de converter a interface automaticamente em um painel eletrônico genérico.
+
+Não adicione animações, efeitos ou decorações que prejudiquem a legibilidade ou contradigam a referência visual.
+
+A implementação poderá utilizar SVG, CSS e componentes React para representar os circuitos de maneira precisa e interativa.
+
+## 5. ESTRUTURA FUNCIONAL DO JOGO
+
+Implemente o fluxo principal contemplando:
+
+1. Tela inicial.
+2. Início de uma nova partida.
+3. Preparação da fase A1.
+4. Configuração interativa dos clipes.
+5. Ação `Concluir`.
+6. Feedback de acerto ou erro.
+7. Consulta da dica após uma conclusão incorreta.
+8. Ação `Redefinir`.
+9. Progressão pelas 15 fases.
+10. Encerramento por vitória ou derrota.
+11. Tela de ranking.
+12. Opção de iniciar uma nova partida ou retornar à tela inicial.
+
+A documentação não especifica todos os detalhes visuais ou de navegação dessas telas. Use a imagem de referência para orientar a apresentação e implemente apenas o necessário para suportar os fluxos funcionais definidos.
+
+### 5.1 Progressão das fases
+
+O jogo possui exatamente 15 fases, nesta sequência:
+
+A1 → A2 → A3 → B1 → B2 → B3 → C1 → C2 → C3 → D1 → D2 → D3 → E1 → E2 → E3.
+
+Cada grupo de três fases constitui um nível:
+
+- Nível A: introdução aos circuitos e às portas básicas.
+- Nível B: introdução de outras portas e aumento das escolhas.
+- Nível C: aumento gradual da complexidade.
+- Nível D: maior complexidade e dependência entre portas.
+- Nível E: maior dificuldade, terminando no desafio E3.
+
+A dificuldade deve aumentar ao longo da progressão. Entretanto, as quantidades de portas, clipes, entradas e combinações de cada nível ainda não foram definidas.
+
+Não apresente uma distribuição inventada de portas por nível como requisito definitivo. Utilize perfis de dificuldade configuráveis e registre as escolhas provisórias necessárias para a demonstração.
+
+### 5.2 Fase A1 — tutorial inicial
+
+A fase A1 deverá conter:
+
+- Uma fonte de energia representada por uma pilha.
+- Um caminho de circuito.
+- Um clipe/chave.
+- Uma lâmpada.
+- Uma missão para acender a lâmpada.
+
+Estado inicial:
+
+- Clipe aberto/desconectado.
+- Caminho interrompido.
+- Lâmpada apagada.
+- Contador de tempo em zero.
+- Três corações disponíveis.
+
+A missão é acender a lâmpada.
+
+O jogador deverá fechar/conectar o clipe e pressionar `Concluir` para completar o circuito e concluir corretamente a fase.
+
+Essa configuração inicial deverá ser armazenada para que `Redefinir` restaure exatamente o estado original da fase.
+
+## 6. IMPLEMENTAÇÃO DA LÓGICA DIGITAL
+
+A lógica do jogo precisa ser funcional, não apenas visual.
+
+Cada clipe possui dois estados:
+
+| Estado físico | Valor lógico | Valor binário |
+|---|---|---|
+| Fechado/conectado | `true` | `1` |
+| Aberto/desconectado | `false` | `0` |
+
+O estado dos clipes determina os valores de entrada do circuito.
+
+As portas lógicas devem calcular seus resultados de acordo com suas respectivas tabelas-verdade.
+
+Implemente as sete portas documentadas.
+
+### 6.1 Porta AND — E
+
+A saída será `1` somente quando todas as entradas forem `1`.
+
+| A | B | Saída |
+|---|---|---|
+| 0 | 0 | 0 |
+| 0 | 1 | 0 |
+| 1 | 0 | 0 |
+| 1 | 1 | 1 |
+
+### 6.2 Porta OR — OU
+
+A saída será `1` quando pelo menos uma entrada for `1`.
+
+| A | B | Saída |
+|---|---|---|
+| 0 | 0 | 0 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 1 |
+
+### 6.3 Porta NOT — NÃO
+
+A porta inverte o valor da única entrada.
+
+| A | Saída |
+|---|---|
+| 0 | 1 |
+| 1 | 0 |
+
+### 6.4 Porta NAND — NÃO-E
+
+A saída é a inversão do resultado de AND.
+
+| A | B | Saída |
+|---|---|---|
+| 0 | 0 | 1 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+### 6.5 Porta NOR — NÃO-OU
+
+A saída é a inversão do resultado de OR.
+
+| A | B | Saída |
+|---|---|---|
+| 0 | 0 | 1 |
+| 0 | 1 | 0 |
+| 1 | 0 | 0 |
+| 1 | 1 | 0 |
+
+### 6.6 Porta XOR — OU exclusivo
+
+A saída será `1` quando as entradas forem diferentes.
+
+| A | B | Saída |
+|---|---|---|
+| 0 | 0 | 0 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+### 6.7 Porta XNOR — NÃO-OU exclusivo
+
+A saída será `1` quando as entradas forem iguais.
+
+| A | B | Saída |
+|---|---|---|
+| 0 | 0 | 1 |
+| 0 | 1 | 0 |
+| 1 | 0 | 0 |
+| 1 | 1 | 1 |
+
+### 6.8 Regras para o avaliador
+
+Separe o cálculo lógico da apresentação visual.
+
+O avaliador deverá:
+
+1. Ler os estados atuais dos clipes.
+2. Calcular os valores das entradas.
+3. Executar as operações das portas correspondentes.
+4. Propagar os resultados entre portas conectadas.
+5. Determinar a saída final do circuito.
+6. Comparar a saída com a missão da fase.
+7. Retornar um resultado de validação.
+
+A missão será satisfeita quando:
+
+- Lâmpada solicitada acesa: saída final `1`.
+- Lâmpada solicitada apagada: saída final `0`.
+
+A mesma combinação de entradas deve produzir sempre o mesmo resultado lógico.
+
+Não utilize o estado visual da lâmpada como substituto do cálculo lógico. Sua aparência deverá refletir a saída calculada.
+
+Não aplique a tabela-verdade de uma porta às demais.
+
+Não gere circuitos cíclicos, sem solução ou com conexões que o avaliador não consiga interpretar.
+
+A geração dos circuitos deve garantir pelo menos uma solução válida por fase.
+
+## 7. VALIDAÇÃO E INTERAÇÃO
+
+A validação formal deverá ocorrer exclusivamente quando o jogador acionar `Concluir`.
+
+Mudar o estado de um clipe não pode, por si só, concluir a fase, gerar uma penalidade ou registrar uma tentativa.
+
+### 7.1 Quando a solução estiver correta
+
+Ao acionar `Concluir` com uma configuração correta:
+
+1. O sistema confirma a solução.
+2. A fase é concluída.
+3. Se essa for a primeira ação `Concluir` da fase, são aplicados os bônus de primeira tentativa.
+4. O jogador avança à fase seguinte.
+5. O tempo da nova fase começa em zero.
+6. Os corações mantêm seu valor, considerando as recompensas já aplicadas.
+7. Ao concluir E3, o jogo termina e apresenta o ranking.
+
+A primeira tentativa é a primeira ação `Concluir` naquela fase, desde que nenhuma conclusão incorreta tenha ocorrido antes. A ação `Redefinir` não apaga o histórico de tentativas.
+
+### 7.2 Quando a solução estiver incorreta
+
+Ao acionar `Concluir` com uma configuração incorreta:
+
+1. Exibir um feedback claro de erro.
+2. Manter a fase atual.
+3. Preservar a configuração atual dos clipes.
+4. Acrescentar 10 segundos ao contador da fase.
+5. Remover um coração.
+6. Disponibilizar a dica exclusiva da fase.
+7. Permitir que o jogador continue ajustando o circuito.
+8. Aguardar uma nova ação explícita de `Concluir` para efetuar outra avaliação.
+
+A penalidade deve ocorrer exatamente uma vez por submissão incorreta.
+
+Não aplique a penalidade continuamente enquanto o circuito estiver errado.
+
+Não restaure o circuito automaticamente depois do erro.
+
+Se os corações chegarem a zero, ou se o tempo da fase atingir o limite, encerre a partida e encaminhe o jogador ao ranking.
+
+## 8. CRONÔMETRO, CORAÇÕES E RECOMPENSAS
+
+### 8.1 Cronômetro
+
+Cada fase começa com zero segundos e possui limite de 300 segundos, equivalentes a cinco minutos.
+
+Regras:
+
+- O contador avança naturalmente durante a fase.
+- Cada conclusão incorreta adiciona 10 segundos.
+- Uma primeira conclusão correta reduz cinco segundos.
+- O contador nunca fica abaixo de zero.
+- O contador é reiniciado em zero ao entrar na próxima fase.
+- A ação `Redefinir` não reinicia nem pausa o contador.
+- Ao atingir 300 segundos, a partida termina em derrota e o jogador segue para o ranking.
+
+A documentação ainda registra uma pendência sobre a interação exata entre o tempo decorrido naturalmente e os ajustes de bônus e penalidades. Utilize a interpretação operacional descrita na documentação, mantenha o cálculo isolado e registre essa pendência em `PENDENCIAS.md`.
+
+Não ultrapasse o limite de 300 segundos sem encerrar a partida.
+
+### 8.2 Corações
+
+A partida começa com três corações.
+
+- Cada conclusão incorreta remove um coração.
+- Uma conclusão correta na primeira tentativa recupera meio coração.
+- Os corações persistem durante a partida e entre fases.
+- `Redefinir` não restaura corações.
+- Ao chegar a zero corações, a partida termina em derrota.
+
+O limite superior de corações fracionários ainda não foi aprovado. Não invente um limite definitivo. Deixe a regra configurável e registre a decisão provisória necessária para tornar o protótipo jogável.
+
+### 8.3 Bônus de primeira tentativa
+
+Ao concluir corretamente uma fase na primeira tentativa:
+
+- Reduzir o contador atual em cinco segundos.
+- Recuperar meio coração.
+- Aplicar o bônus de pontuação de primeira tentativa somente conforme a fórmula implementada e documentada como provisória, até que a fórmula definitiva seja aprovada.
+
+Não conceder novamente os bônus de primeira tentativa depois de uma conclusão incorreta na mesma fase.
+
+## 9. AÇÃO REDEFINIR
+
+A ação deverá ser apresentada como `Redefinir`, respeitando a nomenclatura funcional da documentação.
+
+Ao ser acionada:
+
+- Restaurar todos os clipes ao estado inicial da fase atual.
+- Restaurar os caminhos controlados pelos clipes à configuração inicial.
+- Manter a fase atual.
+- Manter os corações atuais.
+- Manter o cronômetro em andamento.
+- Preservar o histórico de tentativas.
+- Preservar os bônus e as penalidades já registrados.
+- Não validar automaticamente o circuito.
+- Não avançar de fase.
+- Não gerar outro circuito.
+
+O estado original deve pertencer à instância da fase que está sendo jogada.
+
+Após um erro, `Redefinir` não poderá apagar o erro anterior nem habilitar novamente a recompensa por primeira tentativa.
+
+## 10. DICAS E CONTEÚDO EDUCATIVO
+
+Cada fase deverá estar associada a uma dica exclusiva.
+
+A dica ficará disponível para consulta após uma conclusão incorreta.
+
+Ela não deve substituir a validação do circuito. O jogador continua responsável por ajustar a solução e acionar `Concluir`.
+
+Não utilize a mesma dica genérica para todas as fases.
+
+Como o conteúdo oficial das dicas ainda não foi fornecido, não invente textos definitivos. Organize as dicas em uma estrutura configurável vinculada ao identificador e à instância do circuito.
+
+Enquanto os conteúdos estiverem pendentes, identifique claramente os textos provisórios.
+
+Quando uma nova porta lógica for introduzida, o jogo deverá disponibilizar um texto educativo curto que explique seu funcionamento.
+
+Diferencie:
+
+- **Post-it educativo:** explica o funcionamento de uma porta lógica.
+- **Dica da fase:** orienta a resolução da missão específica daquela fase.
+
+O momento exato de apresentação e a possibilidade de reabrir os post-its ainda não foram definidos. Não transforme essas escolhas em regras permanentes sem documentá-las como provisórias.
+
+## 11. GERAÇÃO DOS CIRCUITOS
+
+Os circuitos devem ser gerados de acordo com o perfil de dificuldade da fase.
+
+Não dependa exclusivamente de uma tela desenhada manualmente para cada fase.
+
+A geração deverá ser baseada em estruturas de dados configuráveis, separando o circuito, seus estados iniciais, suas portas, suas conexões, sua missão e sua dificuldade.
+
+Cada instância deve possuir:
+
+- Identificador da fase.
+- Identificador único da instância, quando aplicável.
+- Perfil de dificuldade.
+- Missão de acender ou apagar a lâmpada.
+- Fonte de energia.
+- Caminhos e conexões.
+- Clipes/chaves.
+- Portas lógicas.
+- Estado inicial de cada clipe.
+- Solução válida verificável.
+- Dica compatível com o circuito.
+- Material educativo das novas portas utilizadas.
+
+O algoritmo exato de geração e a distribuição das portas ainda estão pendentes.
+
+Para produzir um protótipo funcional, implemente um gerador simples, determinístico e configurável, com modelos válidos de circuitos. As escolhas provisórias devem ficar claramente identificadas e ser facilmente substituíveis.
+
+Não alegue que os perfis provisórios representam o balanceamento definitivo do jogo.
+
+A geração deve respeitar estas restrições:
+
+1. A fase A1 segue a configuração introdutória especificada.
+2. O nível A utiliza circuitos básicos sem mesclagem entre portas.
+3. Os níveis posteriores apresentam complexidade crescente.
+4. E3 corresponde à maior dificuldade.
+5. Cada circuito deve possuir pelo menos uma solução válida.
+6. A dica precisa corresponder ao circuito efetivamente apresentado.
+7. A ação `Redefinir` deve recuperar a mesma instância, sem gerar outro circuito.
+8. Um erro nunca deve alterar a topologia do circuito atual.
+
+Antes de disponibilizar qualquer circuito, verifique se ele é válido para o avaliador e possui uma solução possível.
+
+## 12. PONTUAÇÃO E RANKING
+
+A documentação estabelece as seguintes regras:
+
+- O desempenho mais rápido deve gerar mais pontos.
+- A referência original menciona 100 pontos por cada 10 segundos.
+- A conclusão na primeira tentativa dobra o valor de pontuação correspondente.
+- A pontuação maior deve aparecer primeiro no ranking.
+- Para pontuações iguais, o resultado mais recente deve aparecer antes do mais antigo.
+- Uma pontuação menor não deve substituir o recorde anterior do mesmo jogador.
+- Uma partida abandonada descarta os pontos daquela execução.
+- Após vitória ou derrota, o jogador deve ter acesso ao ranking.
+
+A fórmula matemática definitiva da pontuação ainda não foi aprovada.
+
+Não invente silenciosamente uma fórmula e a apresente como definitiva.
+
+Implemente um módulo independente para cálculo da pontuação, permitindo substituir a fórmula sem alterar o restante do jogo. Caso seja necessário demonstrar a funcionalidade, use uma regra explicitamente provisória e documentada.
+
+Também estão pendentes a identificação do jogador, a persistência entre sessões, os campos apresentados no ranking e o tratamento de determinados empates.
+
+Não introduza login, autenticação ou banco de dados remoto apenas para resolver essas pendências.
+
+Implemente a tela de ranking e as ações de navegação usando a estratégia provisória mais simples, mantendo as limitações claramente documentadas.
+
+A tela deve permitir:
+
+- Visualizar os resultados disponíveis.
+- Ordenar por pontuação decrescente.
+- Ordenar por recência decrescente quando houver pontuações iguais.
+- Iniciar uma nova partida.
+- Voltar à tela inicial.
+
+Concluir E3 ou perder por tempo/corações encaminha ao ranking.
+
+## 13. ARQUITETURA E IMPLEMENTAÇÃO TÉCNICA
+
+Implemente uma aplicação web executável no ambiente do Google AI Studio.
+
+Utilize React com TypeScript, caso esse seja o ambiente disponibilizado pelo Build mode. Prefira uma estrutura simples, tipada, modular e fácil de manter.
+
+Separe responsabilidades como:
+
+- Apresentação da interface.
+- Renderização dos circuitos.
+- Interação com os clipes.
+- Avaliação das portas lógicas.
+- Geração dos circuitos.
+- Controle da partida.
+- Gerenciamento dos estados das fases.
+- Cronômetro.
+- Corações, bônus e penalidades.
+- Dicas e material educativo.
+- Pontuação.
+- Ranking.
+
+Organize a lógica de maneira que a aparência do circuito possa ser modificada sem alterar as tabelas-verdade ou o sistema de validação.
+
+O cálculo das portas deverá ser independente dos componentes visuais.
+
+A progressão, as dificuldades e as configurações provisórias precisam ser centralizadas em arquivos próprios, e não espalhadas por diversos componentes.
+
+Utilize componentes reutilizáveis e estruturas de dados tipadas para representar portas, clipes, conexões, circuitos, fases e estados da partida.
+
+Evite dependências desnecessárias.
+
+Não adicione chamadas de API, serviços externos, autenticação ou persistência remota sem requisito aprovado.
+
+Não dependa de serviços de IA em tempo de execução para decidir se uma solução está correta. O resultado deve ser calculado de forma determinística pelo próprio jogo.
+
+## 14. ESTADOS E INTEGRIDADE DA PARTIDA
+
+Controle explicitamente os estados funcionais da partida:
+
+- `PartidaIniciada`
+- `FaseEmAndamento`
+- `ErroDeSolucao`
+- `FaseConcluida`
+- `PartidaPerdida`
+- `PartidaAbandonada`
+- `Ranking`
+- `TelaInicial`
+
+Respeite as transições documentadas.
+
+Garanta os seguintes invariantes:
+
+1. Existem exatamente 15 fases, de A1 a E3.
+2. Não há avanço quando o jogador apresenta uma solução incorreta.
+3. A validação só ocorre em `Concluir`.
+4. Cada conclusão incorreta gera no máximo uma penalidade.
+5. A configuração é preservada após o erro.
+6. `Redefinir` não apaga tentativas nem restaura recursos.
+7. O temporizador reinicia apenas ao entrar em uma nova fase.
+8. Os corações persistem entre fases.
+9. A primeira conclusão correta concede os bônus definidos.
+10. A partida não continua depois de confirmada uma condição terminal.
+11. Uma fase não é concluída sem satisfazer sua missão.
+12. O gerador não apresenta circuitos sem solução válida.
+
+Implemente proteções para impedir duplo processamento de um mesmo evento, como duas penalidades provocadas por um único clique em `Concluir`.
+
+## 15. TESTES OBRIGATÓRIOS
+
+Depois de implementar, verifique o funcionamento real da aplicação na pré-visualização.
+
+Não considere suficiente apenas gerar arquivos ou compilar a interface.
+
+Execute, quando o ambiente permitir, verificações dos seguintes cenários:
+
+### Testes de lógica
+
+- AND com todas as combinações de entradas.
+- OR com todas as combinações de entradas.
+- NOT com os dois valores possíveis.
+- NAND com todas as combinações de entradas.
+- NOR com todas as combinações de entradas.
+- XOR com todas as combinações de entradas.
+- XNOR com todas as combinações de entradas.
+- Propagação do resultado entre portas conectadas.
+- Correspondência entre a saída final e a missão.
+
+### Testes de interação
+
+- Alternar o estado de um clipe.
+- Confirmar que a mudança de um clipe não dispara validação.
+- Concluir um circuito correto.
+- Concluir um circuito incorreto.
+- Verificar a preservação do circuito após um erro.
+- Verificar a disponibilização da dica após o erro.
+- Redefinir o circuito.
+- Verificar que `Redefinir` não restaura corações nem apaga tentativas.
+
+### Testes de recursos
+
+- Início com três corações.
+- Perda de um coração por conclusão incorreta.
+- Acréscimo de 10 segundos por erro.
+- Recompensa de cinco segundos por conclusão correta na primeira tentativa.
+- Recuperação de meio coração na primeira conclusão correta.
+- Reinicialização do cronômetro ao avançar de fase.
+- Derrota ao atingir 300 segundos.
+- Derrota ao chegar a zero corações.
+
+### Testes de progressão e ranking
+
+- Percorrer as fases na sequência correta.
+- Confirmar a existência das 15 fases.
+- Verificar o aumento de dificuldade configurado.
+- Confirmar que E3 encerra a progressão.
+- Confirmar que vitória e derrota levam ao ranking.
+- Confirmar que o ranking permite iniciar outra partida ou retornar à tela inicial.
+- Verificar a ordenação por pontuação e recência, usando dados de teste.
+
+Se algum teste não puder ser executado, informe essa limitação com precisão. Não declare testes aprovados sem evidência de que foram executados.
+
+## 16. DOCUMENTAÇÃO COMPLEMENTAR
+
+Além da aplicação, crie um arquivo `PENDENCIAS.md` contendo:
+
+- Decisões funcionais ainda não aprovadas.
+- Suposições provisórias adotadas.
+- Justificativa de cada suposição.
+- Local do código em que cada configuração pode ser alterada.
+- Consequências funcionais das decisões provisórias.
+- Testes que dependem da aprovação dessas decisões.
+
+Mantenha as pendências separadas das regras definitivas.
+
+Não modifique a documentação original nem marque requisitos pendentes como aprovados.
+
+Inclua também um `README.md` com instruções para executar a aplicação e uma descrição concisa da organização do código.
+
+## 17. CRITÉRIOS DE ACEITAÇÃO FINAL
+
+A implementação somente deverá ser considerada concluída quando:
+
+- A aplicação abrir e funcionar na pré-visualização.
+- A interface seguir a imagem de referência, dentro das limitações efetivas dos arquivos recebidos.
+- O jogador conseguir iniciar uma partida.
+- A fase A1 funcionar integralmente.
+- Os clipes puderem ser manipulados.
+- A lógica das sete portas estiver corretamente implementada.
+- A ação `Concluir` avaliar o circuito de forma determinística.
+- Erros preservarem a configuração e aplicarem as penalidades corretas.
+- `Redefinir` restaurar a configuração inicial sem restaurar recursos.
+- A progressão contemplar as 15 fases.
+- O gerador fornecer circuitos válidos e solucionáveis.
+- As regras de tempo e corações estiverem operacionais.
+- Os fluxos de vitória, derrota e ranking estiverem implementados.
+- O código estiver organizado e sem dependências desnecessárias.
+- As pendências estiverem documentadas.
+- As verificações executadas e os resultados reais dos testes estiverem informados.
+
+Não declare o jogo completo se existirem funcionalidades obrigatórias ausentes ou erros críticos conhecidos.
+
+## 18. INSTRUÇÃO FINAL DE EXECUÇÃO
+
+Comece examinando a documentação funcional completa e a imagem de referência.
+
+Em seguida, identifique internamente quais partes são requisitos definidos e quais dependem de decisões pendentes. Use essa distinção para orientar a implementação.
+
+Depois, desenvolva efetivamente a aplicação, organize os arquivos, execute as verificações disponíveis e corrija os defeitos identificados.
+
+Não pare na etapa de planejamento. Não entregue apenas pseudocódigo, uma lista de componentes, uma descrição conceitual ou uma tela estática.
+
+O resultado esperado é um **protótipo jogável de Lógica de Papel, com identidade visual baseada na imagem anexada, regras implementadas conforme a documentação funcional e pendências explicitamente isoladas e documentadas**.
+
+Ao concluir, apresente um relatório objetivo com:
+
+1. Funcionalidades implementadas.
+2. Arquivos e componentes principais.
+3. Testes executados e seus resultados.
+4. Pendências funcionais que continuam abertas.
+5. Suposições provisórias que precisam de aprovação.
+
+Priorize fidelidade aos requisitos, consistência lógica, funcionamento verificável e fidelidade visual. Não sacrifique esses critérios para adicionar funcionalidades que não foram solicitadas.
