@@ -1,6 +1,6 @@
 import React from 'react';
-import { Trophy, AlertOctagon, ArrowRight } from 'lucide-react';
 import { soundManager } from '../logic/sound';
+import { RoughBg } from './RoughBg';
 
 interface VictoryModalProps {
   playerName: string;
@@ -9,65 +9,64 @@ interface VictoryModalProps {
   onProceedToRanking: () => void;
 }
 
-export const VictoryModal: React.FC<VictoryModalProps> = ({
-  playerName,
-  score,
-  totalTimeSeconds,
-  onProceedToRanking,
-}) => {
+/** Selo desenhado à mão: estrela de lápis com visto no centro. */
+const VictorySeal: React.FC = () => (
+  <svg width="104" height="104" viewBox="0 0 104 104" fill="none" aria-hidden="true" style={{ display: 'block', margin: '0 auto 6px' }}>
+    <path
+      d="M 52 6 L 63 33 L 92 30 L 72 52 L 90 76 L 61 72 L 52 99 L 42 72 L 13 78 L 32 53 L 14 28 L 42 33 Z"
+      fill="#fbe58a"
+      stroke="#6b4f10"
+      strokeWidth="3"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M 52 6 L 63 33 L 92 30 L 72 52 L 90 76 L 61 72 L 52 99 L 42 72 L 13 78 L 32 53 L 14 28 L 42 33 Z"
+      fill="url(#hatch-yellow)"
+      opacity="0.55"
+    />
+    <path pathLength="1" className="check-draw" d="M 30 54 L 46 70 L 76 34" stroke="#2f5f3a" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+export const VictoryModal: React.FC<VictoryModalProps> = ({ playerName, score, totalTimeSeconds, onProceedToRanking }) => {
   const mins = Math.floor(totalTimeSeconds / 60);
   const secs = totalTimeSeconds % 60;
   const timeFormatted = `${mins}m ${secs}s`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs select-none">
-      <div className="relative max-w-md w-full bg-amber-50 border-2 border-amber-400 rounded-md p-8 shadow-2xl sketch-border text-center">
-        {/* Top Tape */}
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-32 h-7 bg-white/75 border border-amber-200 shadow-xs rotate-1 pointer-events-none rounded-xs" />
-
-        <div className="flex justify-center mb-3">
-          <div className="w-16 h-16 rounded-full bg-amber-100 border-2 border-amber-300 flex items-center justify-center shadow-inner">
-            <Trophy className="w-9 h-9 text-amber-600 fill-amber-300" />
+    <div className="paper-scrim">
+      <div className="paper-modal" role="dialog" aria-label="Vitória completa">
+        <RoughBg seed="victory" fill="#faf3dc" stroke="#6b4f10" hatch="hatch-yellow" hatchOpacity={0.1} strokeWidth={3} amp={2.4} />
+        <span className="tape tape--l" style={{ top: -10, left: '50%', marginLeft: -31 }} />
+        <div className="rough-content">
+          <VictorySeal />
+          <h2 className="paper-modal__title">Vitória completa!</h2>
+          <p className="paper-modal__text">
+            Parabéns, <strong style={{ color: 'var(--pencil-blue)' }}>{playerName}</strong>! Você decifrou todas as 15 fases de circuitos lógicos!
+          </p>
+          <div className="paper-modal__stats">
+            <div>
+              <span>pontuação final</span>
+              <b>{score.toLocaleString()}</b>
+            </div>
+            <div>
+              <span>tempo total</span>
+              <b>{timeFormatted}</b>
+            </div>
           </div>
+          <button
+            type="button"
+            className="hand-btn"
+            style={{ ['--r' as string]: '-1.5deg', width: '100%' }}
+            onClick={() => {
+              soundManager.playSuccess();
+              onProceedToRanking();
+            }}
+          >
+            <RoughBg seed="victory-btn" fill="#e4efd3" stroke="#2f5f3a" hatch="hatch-green" hatchOpacity={0.4} strokeWidth={3} amp={2.2} />
+            <span className="rough-content" style={{ color: '#1f4a2a' }}>Ver minha posição no ranking →</span>
+          </button>
         </div>
-
-        <h2 className="font-caveat font-extrabold text-4xl sm:text-5xl text-amber-950 mb-1">
-          Vitória Completa!
-        </h2>
-        <p className="font-hand text-xl text-slate-700 mb-6">
-          Parabéns, <strong className="text-amber-900 font-bold">{playerName}</strong>! Você decifrou com maestria todas as 15 fases de circuitos lógicos!
-        </p>
-
-        <div className="bg-white/90 border border-amber-300 rounded-sm p-4 mb-6 grid grid-cols-2 gap-4">
-          <div>
-            <div className="text-xs uppercase font-mono-code font-bold text-slate-500">
-              Pontuação Final
-            </div>
-            <div className="font-caveat font-extrabold text-3xl text-emerald-700">
-              {score.toLocaleString()}
-            </div>
-          </div>
-          <div>
-            <div className="text-xs uppercase font-mono-code font-bold text-slate-500">
-              Tempo Total
-            </div>
-            <div className="font-mono-code font-bold text-2xl text-slate-800">
-              {timeFormatted}
-            </div>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            soundManager.playSuccess();
-            onProceedToRanking();
-          }}
-          className="w-full py-3 px-6 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-caveat font-bold text-3xl rounded-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-        >
-          Ver Sua Posição no Ranking
-          <ArrowRight className="w-6 h-6" />
-        </button>
       </div>
     </div>
   );
@@ -81,55 +80,48 @@ interface DefeatModalProps {
   onProceedToRanking: () => void;
 }
 
-export const DefeatModal: React.FC<DefeatModalProps> = ({
-  playerName,
-  reason,
-  lastPhaseId,
-  score,
-  onProceedToRanking,
-}) => {
+export const DefeatModal: React.FC<DefeatModalProps> = ({ playerName, reason, lastPhaseId, score, onProceedToRanking }) => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs select-none">
-      <div className="relative max-w-md w-full bg-slate-100 border-2 border-red-300 rounded-md p-8 shadow-2xl sketch-border text-center">
-        {/* Top Tape */}
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-32 h-7 bg-white/75 border border-slate-300 shadow-xs -rotate-2 pointer-events-none rounded-xs" />
-
-        <div className="flex justify-center mb-3">
-          <div className="w-16 h-16 rounded-full bg-red-100 border-2 border-red-300 flex items-center justify-center shadow-inner">
-            <AlertOctagon className="w-9 h-9 text-red-600" />
+    <div className="paper-scrim">
+      <div className="paper-modal paper-modal--defeat" role="dialog" aria-label="Fim de partida">
+        <RoughBg seed="defeat" fill="#f3ece0" stroke="#4b515b" hatch="hatch-graphite" hatchOpacity={0.08} strokeWidth={3} amp={2.4} />
+        <span className="tape tape--r" style={{ top: -10, left: '50%', marginLeft: -31 }} />
+        <div className="rough-content">
+          <svg width="84" height="84" viewBox="0 0 84 84" fill="none" aria-hidden="true" style={{ display: 'block', margin: '0 auto 6px' }}>
+            <path d="M 42 6 C 63 5 79 21 78 42 C 77 63 61 79 41 78 C 20 77 5 62 6 41 C 7 22 22 7 42 6" stroke="#c0392f" strokeWidth="3" opacity="0.8" />
+            <path pathLength="1" className="scribble-draw" d="M 24 24 L 60 60" stroke="#c0392f" strokeWidth="6" strokeLinecap="round" />
+            <path pathLength="1" className="scribble-draw" style={{ animationDelay: '0.3s' }} d="M 60 23 L 25 61" stroke="#c0392f" strokeWidth="6" strokeLinecap="round" />
+          </svg>
+          <h2 className="paper-modal__title">Fim de partida</h2>
+          <p className="paper-modal__text">
+            Que pena, <strong style={{ color: 'var(--pencil-blue)' }}>{playerName}</strong>!{' '}
+            {reason === 'hearts'
+              ? 'Seus corações se esgotaram antes de completar o circuito.'
+              : 'O cronômetro da fase atingiu o tempo limite de 5 minutos.'}
+          </p>
+          <div className="paper-modal__stats">
+            <div>
+              <span>fase alcançada</span>
+              <b>{lastPhaseId}</b>
+            </div>
+            <div>
+              <span>pontos acumulados</span>
+              <b>{score.toLocaleString()}</b>
+            </div>
           </div>
+          <button
+            type="button"
+            className="hand-btn"
+            style={{ ['--r' as string]: '1.5deg', width: '100%' }}
+            onClick={() => {
+              soundManager.playPaperTap();
+              onProceedToRanking();
+            }}
+          >
+            <RoughBg seed="defeat-btn" fill="#ece4d4" stroke="#2a2e35" hatch="hatch-graphite" hatchOpacity={0.3} strokeWidth={3} amp={2.2} />
+            <span className="rough-content">Salvar e ir ao ranking →</span>
+          </button>
         </div>
-
-        <h2 className="font-caveat font-extrabold text-4xl text-slate-900 mb-1">
-          Fim de Partida
-        </h2>
-        <p className="font-hand text-xl text-slate-700 mb-4">
-          Que pena, <strong className="text-slate-900 font-bold">{playerName}</strong>!{' '}
-          {reason === 'hearts'
-            ? 'Seus corações se esgotaram antes de completar o circuito.'
-            : 'O cronômetro da fase atingiu o tempo limite de 5 minutos.'}
-        </p>
-
-        <div className="bg-white border border-slate-300 rounded-sm p-4 mb-6">
-          <div className="text-xs uppercase font-mono-code font-bold text-slate-500">
-            Fase Alcançada: <strong className="text-slate-800">{lastPhaseId}</strong>
-          </div>
-          <div className="font-caveat font-extrabold text-3xl text-slate-900 mt-1">
-            {score.toLocaleString()} pontos acumulados
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            soundManager.playPaperTap();
-            onProceedToRanking();
-          }}
-          className="w-full py-3 px-6 bg-slate-800 hover:bg-slate-900 active:scale-[0.98] text-white font-caveat font-bold text-2xl rounded-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-        >
-          Salvar e Ir para o Ranking
-          <ArrowRight className="w-6 h-6" />
-        </button>
       </div>
     </div>
   );

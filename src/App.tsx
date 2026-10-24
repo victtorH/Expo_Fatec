@@ -18,7 +18,10 @@ import { HintModal } from './components/HintModal';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { RankingScreen } from './components/RankingScreen';
 import { VictoryModal, DefeatModal } from './components/GameOutcomeModals';
-import { Volume2, VolumeX, LogOut, Info } from 'lucide-react';
+import { Stopwatch } from './components/Stopwatch';
+import { PencilHearts } from './components/PencilHearts';
+import { RoughBg } from './components/RoughBg';
+import { HandIcon, LampMini } from './components/HandIcons';
 
 const INITIAL_RANKING_SEEDS: RankingEntry[] = [
   {
@@ -96,10 +99,21 @@ export function App() {
 
   // Feedback and Modals
   const [feedback, setFeedback] = useState<{
-    type: 'error' | 'success';
+    type: 'error' | 'success' | 'info';
     message: string;
     details?: string;
   } | null>(null);
+
+  // Auto-dispensa suave de notificações informativas tranquilas (como redefinir clipes)
+  useEffect(() => {
+    if (feedback?.type === 'info') {
+      const timer = setTimeout(() => {
+        setFeedback((prev) => (prev?.type === 'info' ? null : prev));
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [feedback]);
+
   const [showHintModal, setShowHintModal] = useState<boolean>(false);
   const [showEducationalModal, setShowEducationalModal] = useState<boolean>(false);
   const [defeatReason, setDefeatReason] = useState<'hearts' | 'time' | null>(null);
@@ -155,12 +169,6 @@ export function App() {
       setSeenGates((prev) => new Set(prev).add(level.introducedGate!));
     }
   }, [seenGates]);
-
-  const handleJumpToLevel = useCallback((levelId: string) => {
-    setCurrentLevelId(levelId);
-    const targetLevel = getLevelById(levelId);
-    initLevel(targetLevel);
-  }, [initLevel]);
 
   // Start a new game run
   const startNewGame = useCallback(() => {
@@ -218,9 +226,8 @@ export function App() {
     });
     setClipStates(initialStates);
     setFeedback({
-      type: 'success',
-      message: 'Circuito redefinido',
-      details: 'Os clipes voltaram à posição inicial da fase.',
+      type: 'info',
+      message: 'Os clipes voltaram à posição inicial',
     });
   };
 
@@ -420,135 +427,131 @@ export function App() {
   }
 
   return (
-    <div className="relative min-h-screen w-full notebook-ruled-bg flex flex-col justify-between p-4 sm:p-6 overflow-x-hidden select-none">
-      {/* Top Bar: Mission & Status Cluster */}
-      <header className="w-full max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3 z-10">
-        {/* Left: Phase Title & Mission Lockup */}
-        <div className="flex items-center gap-3">
-          <div className="bg-white/90 border border-slate-300 px-3 py-1.5 rounded-sm shadow-xs flex items-center gap-2">
-            <span className="font-caveat font-extrabold text-2xl text-slate-900">
-              Fase {currentLevel.id}:
-            </span>
-            <span className="font-hand font-bold text-lg text-slate-700">
-              {currentLevel.title}
-            </span>
-            {/* Quick Phase Selector */}
-            <select
-              value={currentLevelId}
-              onChange={(e) => handleJumpToLevel(e.target.value)}
-              className="ml-1 text-xs font-hand font-bold bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded px-1.5 py-0.5 text-slate-700 cursor-pointer"
-              title="Pular para outra fase"
-            >
-              {ALL_LEVELS.map((lvl) => (
-                <option key={lvl.id} value={lvl.id}>
-                  {lvl.id} - {lvl.title} {lvl.circuit.isPixelBulb ? '👾' : lvl.circuit.hasFishInBulb ? '🐟' : ''}
-                </option>
-              ))}
-            </select>
-          </div>
+    <div className="desk select-none">
+      <div className="sheet-wrap">
+        <div className="sheet-shell">
+          <div className="sheet">
+            <div className="sheet-holes" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </div>
 
-          {/* Mission Badge */}
-          <div
-            className={`px-3 py-1 rounded-sm border shadow-xs flex items-center gap-2 font-hand text-base font-bold ${
-              currentLevel.mission === 'turn_on'
-                ? 'bg-amber-100/90 border-amber-300 text-amber-950'
-                : 'bg-slate-200/90 border-slate-400 text-slate-900'
-            }`}
-          >
-            <span className="text-xl">
-              {currentLevel.mission === 'turn_on' ? '💡' : '⭕'}
-            </span>
-            <span>Missão: {currentLevel.missionText}</span>
+            {/* Anotações de margem: jogador, pontos, som, sair */}
+            <div className="corner-notes">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <HandIcon name="pencil" size={18} strokeWidth={1.8} />
+                <b>{playerName.trim() || 'Jogador'}</b>
+              </span>
+              <span>
+                pontos: <b>{accumulatedScore.toLocaleString()}</b>
+              </span>
+              <button
+                type="button"
+                className="margin-link"
+                onClick={handleToggleMute}
+                aria-label={isMuted ? 'Ativar som' : 'Desativar som'}
+              >
+                <HandIcon name={isMuted ? 'speakerMuted' : 'speaker'} size={20} strokeWidth={2} />
+                som {isMuted ? 'desligado' : 'ligado'}
+              </button>
+              <button
+                type="button"
+                className="margin-link"
+                onClick={handleAbandonRun}
+                title="Abandonar partida (descarta os pontos atuais)"
+              >
+                <HandIcon name="exit" size={20} strokeWidth={2} />
+                sair
+              </button>
+            </div>
+
+            <header className="sheet-header">
+              {/* Identificação da fase: etiqueta presa com fita */}
+              <div>
+                <div className="phase-tag">
+                  <RoughBg seed={`fase-${currentLevel.id}`} fill="#fbf5e2" stroke="#2a2e35" strokeWidth={2.6} amp={2} />
+                  <span className="tape tape--l" style={{ top: -11, left: -14 }} />
+                  <div className="rough-content">
+                    <div className="phase-tag__kicker">{currentLevel.order} de 15</div>
+                    <div className="phase-tag__id">FASE {currentLevel.id}</div>
+                  </div>
+                </div>
+                <p className="phase-title">{currentLevel.title}</p>
+              </div>
+
+              {/* Missão: bilhete escrito colado perto do circuito */}
+              <div className="mission-note">
+                <RoughBg
+                  seed={`missao-${currentLevel.id}`}
+                  fill={currentLevel.mission === 'turn_on' ? '#fdf3c4' : '#e7ebf0'}
+                  stroke="#4b515b"
+                  strokeWidth={2.2}
+                  amp={2.2}
+                />
+                <span className="tape tape--r" style={{ top: -10, right: 24 }} />
+                <div className="rough-content" style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <LampMini on={currentLevel.mission === 'turn_on'} size={44} />
+                  <div>
+                    <div className="mission-note__kicker">Missão:</div>
+                    <div className="mission-note__text">
+                      <span className={`marker ${currentLevel.mission === 'turn_on' ? '' : 'marker--off'}`}>
+                        {currentLevel.missionText}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cronômetro de papel e corações a lápis */}
+              <div className="gauges">
+                <Stopwatch elapsedSeconds={phaseSeconds} />
+                <PencilHearts hearts={hearts} />
+              </div>
+            </header>
+
+            {/* Folha de resolução: o circuito é o protagonista */}
+            <main className="circuit-stage">
+              {feedback && (
+                <FeedbackBanner
+                  type={feedback.type}
+                  message={feedback.message}
+                  details={feedback.details}
+                  onDismiss={() => setFeedback(null)}
+                />
+              )}
+              <CircuitCanvas
+                level={currentLevel}
+                clipStates={clipStates}
+                onToggleClip={handleToggleClip}
+                bulbIsOn={evaluationResult.bulbState}
+                wirePowered={evaluationResult.wirePowered}
+                damageState={
+                  phaseErrorsCount >= 3 ? 'broken' : phaseErrorsCount === 2 ? 'cracked' : 'intact'
+                }
+              />
+            </main>
+
+            <footer className="sheet-footer">
+              <p className="margin-help">
+                Clique nos <em>clipes</em> para abrir ou fechar o caminho.
+                <br />
+                Quando achar a solução, carimbe <em>“Concluir”</em>.
+              </p>
+              <StickyNoteHUD
+                phaseId={currentLevel.id}
+                attemptsCount={phaseAttemptsCount}
+                hasMadeError={hasMadeErrorInPhase}
+                onConcluir={handleConcluir}
+                onRedefinir={handleRedefinir}
+                onOpenHint={() => setShowHintModal(true)}
+                onOpenEducational={() => setShowEducationalModal(true)}
+                isEducationalAvailable={Boolean(currentLevel.introducedGate)}
+              />
+            </footer>
           </div>
         </div>
-
-        {/* Right: Player Name, Score, Audio & Abandon Action */}
-        <div className="flex items-center gap-3">
-          {/* Player badge */}
-          <div className="bg-white/90 border border-slate-300 px-2.5 py-1 rounded-sm shadow-xs font-hand text-sm text-slate-700 flex items-center gap-1.5">
-            <span className="text-blue-600 font-bold">👤</span>
-            <span className="font-bold text-slate-800">{playerName.trim() || 'Jogador'}</span>
-          </div>
-
-          {/* Score display */}
-          <div className="bg-white/90 border border-slate-300 px-3 py-1 rounded-sm shadow-xs font-hand text-sm text-slate-700 flex items-center gap-1.5">
-            <span className="text-slate-500 font-bold uppercase text-xs">Pontos:</span>
-            <span className="font-mono-code font-bold text-base text-slate-900 tabular-nums">
-              {accumulatedScore.toLocaleString()}
-            </span>
-          </div>
-
-          {/* Audio Mute Button */}
-          <button
-            type="button"
-            onClick={handleToggleMute}
-            className="p-1.5 bg-white/80 hover:bg-white text-slate-700 rounded-sm border border-slate-300 shadow-xs cursor-pointer"
-            aria-label={isMuted ? 'Ativar som' : 'Desativar som'}
-          >
-            {isMuted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4" />}
-          </button>
-
-          {/* Abandon Game Button */}
-          <button
-            type="button"
-            onClick={handleAbandonRun}
-            className="flex items-center gap-1 px-2.5 py-1 text-xs font-hand font-bold text-slate-500 hover:text-red-700 bg-white/60 hover:bg-red-50 rounded-sm border border-slate-200 transition-colors cursor-pointer"
-            title="Abandonar partida (descarta os pontos atuais)"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            Sair
-          </button>
-        </div>
-      </header>
-
-      {/* Optional Feedback Alert Banner */}
-      {feedback && (
-        <FeedbackBanner
-          type={feedback.type}
-          message={feedback.message}
-          details={feedback.details}
-          onDismiss={() => setFeedback(null)}
-        />
-      )}
-
-      {/* Main Playfield: SVG Circuit Canvas */}
-      <main className="w-full max-w-5xl mx-auto my-auto flex flex-col items-center justify-center relative">
-        <CircuitCanvas
-          level={currentLevel}
-          clipStates={clipStates}
-          onToggleClip={handleToggleClip}
-          bulbIsOn={evaluationResult.bulbState}
-          wirePowered={evaluationResult.wirePowered}
-          damageState={
-            phaseErrorsCount >= 3 ? 'broken' : phaseErrorsCount === 2 ? 'cracked' : 'intact'
-          }
-        />
-      </main>
-
-      {/* Bottom Sticky Note Controls HUD */}
-      <footer className="w-full max-w-5xl mx-auto flex items-end justify-between pt-2 z-10">
-        <StickyNoteHUD
-          phaseId={currentLevel.id}
-          phaseOrder={currentLevel.order}
-          hearts={hearts}
-          elapsedSeconds={phaseSeconds}
-          attemptsCount={phaseAttemptsCount}
-          hasMadeError={hasMadeErrorInPhase}
-          onConcluir={handleConcluir}
-          onRedefinir={handleRedefinir}
-          onOpenHint={() => setShowHintModal(true)}
-          onOpenEducational={() => setShowEducationalModal(true)}
-          isEducationalAvailable={Boolean(currentLevel.introducedGate)}
-        />
-
-        {/* Small subtle help line */}
-        <div className="hidden sm:block text-right font-hand text-xs text-slate-500/80 pr-2">
-          <span>Clique nos clipes para abrir/fechar o caminho</span>
-          <br />
-          <span>Pressione &ldquo;Concluir&rdquo; no post-it rosa para testar</span>
-        </div>
-      </footer>
-
+      </div>
       {/* Educational Logic Gate Modal */}
       {showEducationalModal && currentLevel.introducedGate && (
         <EducationalModal

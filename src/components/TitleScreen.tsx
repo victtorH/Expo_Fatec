@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Play, Trophy, Volume2, VolumeX, User, Sparkles } from 'lucide-react';
 import { soundManager } from '../logic/sound';
+import { HandIcon } from './HandIcons';
+import { RoughBg } from './RoughBg';
 
 interface TitleScreenProps {
   playerName: string;
@@ -34,122 +35,118 @@ export const TitleScreen: React.FC<TitleScreenProps> = ({
   };
 
   return (
-    <div className="relative min-h-screen w-full notebook-ruled-bg flex flex-col items-center justify-between p-6 sm:p-10 select-none overflow-x-hidden">
-      {/* Top Header / Audio Toggle */}
-      <div className="w-full max-w-4xl flex items-center justify-between z-10">
-        <div className="flex items-center gap-2">
-          <span className="font-hand text-sm font-bold text-slate-600 bg-white/70 px-3 py-1 rounded-sm border border-slate-300 shadow-xs">
-            Desafio Educacional de Circuitos
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onOpenRanking}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 font-hand font-bold text-base rounded-sm border border-amber-300 shadow-xs transition-all cursor-pointer"
-            aria-label="Abrir Ranking"
-          >
-            <Trophy className="w-4 h-4 text-amber-700" />
-            Ranking
-          </button>
-
-          <button
-            type="button"
-            onClick={onToggleMute}
-            className="p-2 bg-white/80 hover:bg-white text-slate-700 rounded-sm border border-slate-300 shadow-xs transition-all cursor-pointer"
-            aria-label={isMuted ? 'Ativar som' : 'Desativar som'}
-          >
-            {isMuted ? <VolumeX className="w-5 h-5 text-red-500" /> : <Volume2 className="w-5 h-5 text-slate-700" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Main Title Centerpiece */}
-      <div className="my-auto text-center max-w-2xl px-4 flex flex-col items-center">
-        {/* Decorative Tape Strip */}
-        <div className="w-48 h-8 bg-white/70 border border-amber-200/60 shadow-xs -rotate-2 -mb-4 z-10 pointer-events-none rounded-xs" />
-
-        {/* Paper Card with Title and Name Registration */}
-        <div className="bg-white/95 border-2 border-slate-800 rounded-md p-7 sm:p-9 shadow-xl sketch-border relative transform rotate-0.5 w-full max-w-xl">
-          {/* Hand-drawn inline SVG Title Lockup */}
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <span className="text-4xl">📎</span>
-            <h1 className="font-caveat font-extrabold text-5xl sm:text-6xl text-slate-900 tracking-tight">
-              Lógica de Papel
-            </h1>
-            <span className="text-4xl">💡</span>
-          </div>
-
-          <p className="font-hand text-lg sm:text-xl text-slate-700 max-w-md mx-auto mb-5 leading-relaxed">
-            Conecte clipes como chaves elétricas, domine as portas lógicas e cumpra a missão da lâmpada ao longo de 15 fases!
-          </p>
-
-          {/* Form to Register Player Name before playing */}
-          <form onSubmit={handleSubmit} className="mb-6 flex flex-col items-center">
-            <div className="w-full max-w-sm text-left mb-3">
-              <label
-                htmlFor="player-name-input"
-                className="block font-hand font-bold text-base text-slate-800 mb-1 flex items-center gap-1.5"
-              >
-                <User className="w-4 h-4 text-blue-600" />
-                Nome do Jogador / Apelido no Ranking:
-              </label>
-
-              <div className="relative">
-                <input
-                  id="player-name-input"
-                  type="text"
-                  maxLength={20}
-                  value={playerName}
-                  onChange={(e) => {
-                    onChangePlayerName(e.target.value);
-                    if (e.target.value.trim()) setNameError(false);
-                  }}
-                  placeholder="Escreva seu nome aqui..."
-                  className={`w-full px-3.5 py-2.5 bg-amber-50/70 border-2 rounded-sm font-caveat font-bold text-2xl text-slate-900 placeholder:text-slate-400 placeholder:font-hand placeholder:text-lg focus:outline-none focus:bg-white transition-all shadow-inner ${
-                    nameError
-                      ? 'border-red-500 ring-2 ring-red-200'
-                      : 'border-slate-400 focus:border-blue-600'
-                  }`}
-                  autoComplete="off"
-                />
-              </div>
-
-              {nameError && (
-                <span className="text-xs font-hand font-bold text-red-600 mt-1 block">
-                  Por favor, digite seu nome ou apelido para salvar sua pontuação no ranking!
-                </span>
-              )}
+    <div className="desk select-none">
+      <div className="sheet-wrap">
+        <div className="sheet-shell">
+          <div className="sheet" style={{ minHeight: 'calc(100vh - 36px)', justifyContent: 'space-between' }}>
+            <div className="sheet-holes" aria-hidden="true">
+              <i />
+              <i />
+              <i />
             </div>
 
-            {/* Start CTA Button */}
-            <button
-              type="submit"
-              className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-caveat font-bold text-3xl sm:text-4xl rounded-sm shadow-lg border-2 border-emerald-900/40 transition-all cursor-pointer w-full max-w-sm mt-1"
-              aria-label="Registrar nome e Iniciar Partida"
-            >
-              <Play className="w-6 h-6 fill-white group-hover:scale-110 transition-transform" />
-              Iniciar Partida
-            </button>
-          </form>
+            {/* Top Bar / Margin Notes */}
+            <div className="corner-notes">
+              <button
+                type="button"
+                onClick={onOpenRanking}
+                className="margin-link"
+                aria-label="Abrir Mural dos Campeões"
+              >
+                <HandIcon name="trophy" size={20} strokeWidth={2} />
+                Mural dos Campeões
+              </button>
 
-          {/* Quick Controls Hint */}
-          <div className="pt-3 border-t border-slate-300 text-slate-600 font-hand text-sm sm:text-base flex flex-wrap items-center justify-center gap-4">
-            <span className="flex items-center gap-1">
-              🖱️ <strong>Clique no clipe:</strong> Conectar / Desconectar
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              ✅ <strong>Botão Concluir:</strong> Validar circuito
-            </span>
+              <button
+                type="button"
+                onClick={onToggleMute}
+                className="margin-link"
+                aria-label={isMuted ? 'Ativar som' : 'Desativar som'}
+              >
+                <HandIcon name={isMuted ? 'speakerMuted' : 'speaker'} size={20} strokeWidth={2} />
+                som {isMuted ? 'desligado' : 'ligado'}
+              </button>
+            </div>
+
+            {/* Sub-header tag */}
+            <div style={{ marginTop: 8 }}>
+              <span className="phase-tag__kicker" style={{ borderBottom: '2px dashed var(--pencil-blue)', paddingBottom: 2 }}>
+                Caderno de Lógica Digital • Circuitos & Portas
+              </span>
+            </div>
+
+            {/* Main Centerpiece */}
+            <div style={{ margin: 'auto 0', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <div style={{ position: 'relative', width: 'min(580px, 100%)', padding: '36px 32px 30px' }}>
+                <RoughBg seed="title-card" fill="#fffdfa" stroke="#2a2e35" strokeWidth={2.8} amp={2.4} />
+                <span className="tape tape--l" style={{ top: -11, left: 32 }} />
+                <span className="tape tape--r" style={{ top: -11, right: 32 }} />
+
+                <div className="rough-content">
+                  {/* Title */}
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 14, justifyContent: 'center' }}>
+                    <span style={{ fontSize: '38px' }}>📎</span>
+                    <h1 style={{ fontFamily: 'var(--font-title)', fontSize: 'clamp(46px, 6vw, 64px)', fontWeight: 700, color: 'var(--ink)', margin: 0, lineHeight: 1 }}>
+                      Lógica de Papel
+                    </h1>
+                    <span style={{ fontSize: '38px' }}>💡</span>
+                  </div>
+
+                  <p style={{ fontFamily: 'var(--font-read)', fontSize: '18px', color: 'var(--ink-soft)', margin: '14px auto 24px', maxWidth: '440px', lineHeight: 1.4 }}>
+                    Conecte clipes como chaves manuais, feche caminhos elétricos e domine as portas lógicas para resolver as 15 fases do caderno!
+                  </p>
+
+                  {/* Player Name Form */}
+                  <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 'min(380px, 100%)', textAlign: 'left' }}>
+                      <label
+                        htmlFor="player-name-input"
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-note)', fontSize: '16px', color: 'var(--ink-soft)' }}
+                      >
+                        <HandIcon name="pencil" size={17} strokeWidth={2} />
+                        Seu nome ou apelido para o ranking:
+                      </label>
+
+                      <div style={{ position: 'relative', marginTop: 4 }}>
+                        <input
+                          id="player-name-input"
+                          type="text"
+                          maxLength={20}
+                          value={playerName}
+                          onChange={(e) => {
+                            onChangePlayerName(e.target.value);
+                            if (e.target.value.trim()) setNameError(false);
+                          }}
+                          placeholder="escreva seu nome aqui..."
+                          className="hand-input"
+                          autoComplete="off"
+                        />
+                      </div>
+
+                      {nameError && (
+                        <span style={{ fontFamily: 'var(--font-title)', fontSize: '18px', color: 'var(--pencil-red)', marginTop: 4, display: 'block' }}>
+                          * Por favor, anote seu nome antes de iniciar!
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="hand-btn"
+                      style={{ ['--r' as string]: '-1.8deg', fontSize: '34px', padding: '12px 38px', marginTop: 10 }}
+                    >
+                      <RoughBg seed="start-btn" fill="#e4efd3" stroke="#2f5f3a" hatch="hatch-green" hatchOpacity={0.35} strokeWidth={3} amp={2.2} />
+                      <span className="rough-content" style={{ display: 'inline-flex', alignItems: 'center', gap: 12, color: '#1f4a2a' }}>
+                        <HandIcon name="play" size={26} strokeWidth={3} fill="#2f5f3a" />
+                        Iniciar Partida
+                      </span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Footer Notes */}
-      <div className="w-full max-w-4xl text-center text-slate-500 font-hand text-sm py-4">
-        15 Fases Progressivas (A1 a E3) • Portas AND, OR, NOT, NAND, NOR, XOR, XNOR • Registro no Mural dos Campeões
       </div>
     </div>
   );

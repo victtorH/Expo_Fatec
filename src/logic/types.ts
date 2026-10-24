@@ -67,6 +67,7 @@ export interface LevelConfig {
     customNote?: string;
     hasFishInBulb?: boolean;
     isPixelBulb?: boolean;
+    isTvBulb?: boolean;
   };
 }
 

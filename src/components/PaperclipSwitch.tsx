@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { soundManager } from '../logic/sound';
+import { jitterPath } from './handDrawn';
 
 interface PaperclipSwitchProps {
   id: string;
@@ -11,6 +12,16 @@ interface PaperclipSwitchProps {
   powered?: boolean;
 }
 
+// Geometria do clipe (pivô em 0,0; ponta direita encosta no terminal em x=68).
+const CLIP_D =
+  'M 2 0 L 58 0 C 68 0 68 -12 58 -12 L 10 -12 C 2 -12 2 6 12 6 L 52 6 C 58 6 58 -2 52 -2 L 16 -2';
+
+/**
+ * Clipe desenhado à mão que funciona como chave.
+ *  - Fechado: o arame deita sobre os dois contatos e completa o caminho.
+ *  - Aberto: o clipe se levanta no pivô e deixa uma interrupção visível.
+ * O estado visual vem direto de `isClosed` (o mesmo usado pelo avaliador lógico).
+ */
 export const PaperclipSwitch: React.FC<PaperclipSwitchProps> = ({
   id,
   label,
@@ -20,148 +31,96 @@ export const PaperclipSwitch: React.FC<PaperclipSwitchProps> = ({
   onToggle,
   powered = false,
 }) => {
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const toggle = () => {
     soundManager.playClipToggle(!isClosed);
     onToggle(id);
   };
 
+  const wireA = useMemo(() => jitterPath(CLIP_D, `clip-a-${id}`, 0.7), [id]);
+  const wireB = useMemo(() => jitterPath(CLIP_D, `clip-b-${id}`, 1.1), [id]);
+  const lead1 = useMemo(() => jitterPath('M -11 0 L 0 0', `lead1-${id}`, 0.4), [id]);
+  const lead2 = useMemo(() => jitterPath('M 68 0 L 74 0', `lead2-${id}`, 0.4), [id]);
+  const ringL = useMemo(() => jitterPath('M -5 0 C -5 -3 -3 -5 0 -5 C 3 -5 5 -3 5 0 C 5 3 3 5 0 5 C -3 5 -5 3 -5 0 Z', `ringL-${id}`, 0.5), [id]);
+  const ringR = useMemo(() => jitterPath('M 63 0 C 63 -3 65 -5 68 -5 C 71 -5 73 -3 73 0 C 73 3 71 5 68 5 C 65 5 63 3 63 0 Z', `ringR-${id}`, 0.5), [id]);
+
+  const rightLive = isClosed && powered;
+
   return (
     <g
       transform={`translate(${x}, ${y})`}
-      className="cursor-pointer group outline-none focus:outline-none"
-      onClick={handleClick}
+      className="clip"
+      data-closed={isClosed ? 'true' : 'false'}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggle();
+      }}
       role="button"
       tabIndex={0}
-      aria-label={`Chave clipe ${label}: atualmente ${isClosed ? 'conectada' : 'desconectada'}. Clique para alterar.`}
+      aria-pressed={isClosed}
+      aria-label={`Clipe ${label}: ${isClosed ? 'fechado, valor 1, caminho conectado' : 'aberto, valor 0, caminho interrompido'}. Clique para alterar.`}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          soundManager.playClipToggle(!isClosed);
-          onToggle(id);
+          toggle();
         }
       }}
     >
-      {/* Invisible larger hit target for comfortable clicking on desktop and touch */}
-      <rect
-        x="-20"
-        y="-35"
-        width="110"
-        height="70"
-        fill="transparent"
-        className="pointer-events-auto"
+      {/* Área de clique generosa (touch/desktop), maior que o desenho */}
+      <rect x="-26" y="-46" width="126" height="98" fill="transparent" />
+
+      {/* Anel de foco desenhado (só aparece com teclado) */}
+      <path
+        className="clip-focus"
+        d="M -22 -30 C 20 -42 60 -42 92 -28 C 104 -14 104 16 90 36 C 60 46 20 46 -18 34 C -32 16 -32 -14 -22 -30 Z"
+        fill="none"
+        stroke="#3b69ad"
+        strokeWidth="2.2"
+        strokeDasharray="6 5"
+        strokeLinecap="round"
       />
 
-      {/* Left Contact Terminal */}
-      <circle
-        cx="0"
-        cy="0"
-        r="4.5"
-        fill={powered ? '#fde047' : '#ffffff'}
-        stroke="#1e293b"
-        strokeWidth="2.4"
-        className="transition-colors duration-150"
-      />
+      {/* Terminais de contato (aros de tinta) */}
+      <path d={lead1} stroke="#2a2e35" strokeWidth="2.4" strokeLinecap="round" fill="none" />
+      <path d={lead2} stroke="#2a2e35" strokeWidth="2.4" strokeLinecap="round" fill="none" />
+      <path d={ringL} fill="#f7f0de" stroke="#2a2e35" strokeWidth="2.2" />
+      {powered && <path d={ringL} fill="url(#hatch-blue)" stroke="none" />}
+      <path d={ringR} fill="#f7f0de" stroke="#2a2e35" strokeWidth="2.2" />
+      {rightLive && <path d={ringR} fill="url(#hatch-blue)" stroke="none" />}
 
-      {/* Right Contact Terminal */}
-      <circle
-        cx="68"
-        cy="0"
-        r="4.5"
-        fill={isClosed && powered ? '#fde047' : '#ffffff'}
-        stroke="#1e293b"
-        strokeWidth="2.4"
-        className="transition-colors duration-150"
-      />
-
-      {/* Spark or connection dot when closed and powered */}
-      {isClosed && powered && (
-        <circle cx="68" cy="0" r="8" fill="#38bdf8" opacity="0.4" className="animate-ping" />
+      {/* Riscos de contato: só quando o clipe fecha o caminho com energia */}
+      {rightLive && (
+        <g stroke="#3b69ad" strokeWidth="1.8" strokeLinecap="round" fill="none" opacity="0.9">
+          <path d="M 77 -8 L 82 -13" />
+          <path d="M 80 0 L 86 0" />
+          <path d="M 77 8 L 82 13" />
+        </g>
       )}
 
-      {/* The Paperclip Switch Element */}
-      {/* Pivots around (0, 0) */}
-      <g
-        style={{
-          transformOrigin: '0px 0px',
-          transform: isClosed ? 'rotate(0deg)' : 'rotate(-26deg)',
-          transition: 'transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        }}
-        className="filter drop-shadow-sm group-hover:brightness-110"
-      >
-        {/* Paperclip Outer Loop & Inner Loop Path */}
-        {/* Soft shadow under clip */}
-        <path
-          d="M 2 2 
-             L 58 2 
-             C 68 2, 68 -10, 58 -10 
-             L 10 -10 
-             C 2 -10, 2 8, 12 8 
-             L 52 8 
-             C 58 8, 58 0, 52 0 
-             L 16 0"
-          fill="none"
-          stroke="rgba(0, 0, 0, 0.2)"
-          strokeWidth="3.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          transform="translate(1, 2)"
-        />
-
-        {/* Paperclip Metallic Wire */}
-        <path
-          d="M 2 0 
-             L 58 0 
-             C 68 0, 68 -12, 58 -12 
-             L 10 -12 
-             C 2 -12, 2 6, 12 6 
-             L 52 6 
-             C 58 6, 58 -2, 52 -2 
-             L 16 -2"
-          fill="none"
-          stroke="#64748b"
-          strokeWidth="3.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="transition-colors"
-        />
-
-        {/* Metallic Highlight Wire */}
-        <path
-          d="M 4 -1 
-             L 56 -1 
-             C 64 -1, 64 -11, 56 -11 
-             L 12 -11 
-             C 4 -11, 4 5, 12 5 
-             L 50 5 
-             C 56 5, 56 -1, 50 -1 
-             L 18 -1"
-          fill="none"
-          stroke="#cbd5e1"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* Small pivot pin/ring over left contact */}
-        <circle cx="0" cy="0" r="3.2" fill="#94a3b8" stroke="#334155" strokeWidth="1.2" />
+      {/* Clipe: arame de metal (contorno de grafite + brilho de lápis azul-prata) */}
+      <g className="clip-arm">
+        <path d={wireB} fill="none" stroke="rgba(42,46,53,0.25)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" transform="translate(1.2, 2.2)" />
+        <path d={wireA} fill="none" stroke="#2a2e35" strokeWidth="4.4" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={wireB} fill="none" stroke="#c7d3e0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M 6 -9.5 L 40 -9.5" fill="none" stroke="#ffffff" strokeWidth="1" strokeLinecap="round" opacity="0.9" />
+        {/* pino do pivô */}
+        <circle cx="0" cy="0" r="3.4" fill="#e9e3d2" stroke="#2a2e35" strokeWidth="1.8" />
       </g>
 
-      {/* Blue Handwritten Label 'A', 'B', etc. below switch */}
+      {/* Etiqueta manuscrita + valor binário */}
       <text
         x="34"
-        y="24"
+        y="36"
         textAnchor="middle"
-        dominantBaseline="hanging"
-        fill="#2563eb"
-        className="font-caveat font-bold select-none group-hover:text-blue-700 transition-colors"
-        style={{ fontSize: '24px', fontWeight: 700 }}
+        fill="#3b69ad"
+        style={{ fontFamily: 'var(--font-title)', fontSize: 28, fontWeight: 700 }}
       >
         {label}
+        <tspan fill="#4b515b" dx="6" style={{ fontFamily: 'var(--font-note)', fontSize: 17, fontWeight: 400 }}>
+          = {isClosed ? 1 : 0}
+        </tspan>
       </text>
 
-      {/* Hover state tooltip bubble */}
-      <title>{`Clipe ${label}: ${isClosed ? 'Fechado (1)' : 'Aberto (0)'} - Clique para alterar`}</title>
+      <title>{`Clipe ${label}: ${isClosed ? 'Fechado (1)' : 'Aberto (0)'} — clique para alterar`}</title>
     </g>
   );
 };

@@ -291,11 +291,11 @@ test('Lamp damage states: 0 or 1 error = intact, 2 errors = cracked (racha), 3+ 
   assert.equal(getBulbDamageState(4), 'broken');
 });
 
-test('Aquarium fish level: Level A1 has hasFishInBulb and valid state transitions', () => {
-  const levelA1 = ALL_LEVELS.find((lvl) => lvl.id === 'A1');
-  assert.ok(levelA1, 'Level A1 must exist');
-  assert.equal(levelA1.mission, 'turn_on', 'Level A1 must have turn_on mission');
-  assert.equal(levelA1.circuit.hasFishInBulb, true, 'Level A1 must feature the aquarium fish');
+test('Aquarium fish level: Level C3 has hasFishInBulb and valid state transitions', () => {
+  const levelC3 = ALL_LEVELS.find((lvl) => lvl.id === 'C3');
+  assert.ok(levelC3, 'Level C3 must exist');
+  assert.equal(levelC3.mission, 'turn_on', 'Level C3 must have turn_on mission');
+  assert.equal(levelC3.circuit.hasFishInBulb, true, 'Level C3 must feature the aquarium fish');
 
   // Test state selector logic
   const getFishVisualState = (isOn: boolean, isBroken: boolean) => {
@@ -312,11 +312,12 @@ test('Aquarium fish level: Level A1 has hasFishInBulb and valid state transition
   assert.equal(getFishVisualState(false, true), 'fallen_out');
   assert.equal(getFishVisualState(true, true), 'fallen_out');
 });
-test('Pixel bulb phase: Level A2 has isPixelBulb and valid state transitions', () => {
-  const levelA2 = ALL_LEVELS.find((lvl) => lvl.id === 'A2');
-  assert.ok(levelA2, 'Level A2 must exist');
-  assert.equal(levelA2.circuit.isPixelBulb, true, 'Level A2 must feature the pixel bulb');
-  assert.equal(levelA2.mission, 'turn_off', 'Level A2 mission is to turn off the pixel bulb');
+
+test('Pixel bulb phase: Level D3 has isPixelBulb and valid state transitions', () => {
+  const levelD3 = ALL_LEVELS.find((lvl) => lvl.id === 'D3');
+  assert.ok(levelD3, 'Level D3 must exist');
+  assert.equal(levelD3.circuit.isPixelBulb, true, 'Level D3 must feature the pixel bulb');
+  assert.equal(levelD3.mission, 'turn_off', 'Level D3 mission is to turn off the pixel bulb');
 
   // Test state selector logic for pixel bulb
   const getPixelBulbVisualState = (isOn: boolean, isBroken: boolean) => {
@@ -333,5 +334,58 @@ test('Pixel bulb phase: Level A2 has isPixelBulb and valid state transitions', (
   assert.equal(getPixelBulbVisualState(false, true), 'Pixel-C_8ffc14b0');
   assert.equal(getPixelBulbVisualState(true, true), 'Pixel-C_8ffc14b0');
 });
+
+test('Retro TV phase: Level E3 has isTvBulb and valid state transitions', () => {
+  const levelE3 = ALL_LEVELS.find((lvl) => lvl.id === 'E3');
+  assert.ok(levelE3, 'Level E3 must exist');
+  assert.equal(levelE3.circuit.isTvBulb, true, 'Level E3 must feature the retro pixel TV');
+  assert.equal(levelE3.mission, 'turn_on', 'Level E3 mission is to turn on the TV');
+
+  // Test state selector logic for TV:
+  // 1ª em anexo: Ligada -> /assets/tv/tv_on.png
+  // 2ª em anexo: Desligada -> /assets/tv/tv_off.png
+  // 4ª em anexo: Quebrando (dois corações / 2 erros) -> /assets/tv/tv_cracked.png (Tela azul :()
+  // 3ª em anexo: Quebrada (perdeu / 3 erros) -> /assets/tv/tv_broken.png (Tela rachada)
+  const getTvVisualState = (isOn: boolean, damageState: 'intact' | 'cracked' | 'broken') => {
+    if (damageState === 'broken') return '/assets/tv/tv_broken.png';
+    if (damageState === 'cracked') return '/assets/tv/tv_cracked.png';
+    if (isOn) return '/assets/tv/tv_on.png';
+    return '/assets/tv/tv_off.png';
+  };
+
+  // Desligada (2ª imagem)
+  assert.equal(getTvVisualState(false, 'intact'), '/assets/tv/tv_off.png');
+  // Ligada (1ª imagem)
+  assert.equal(getTvVisualState(true, 'intact'), '/assets/tv/tv_on.png');
+  // Quebrando / 2 corações / cracked (4ª imagem: Tela Azul :()
+  assert.equal(getTvVisualState(false, 'cracked'), '/assets/tv/tv_cracked.png');
+  assert.equal(getTvVisualState(true, 'cracked'), '/assets/tv/tv_cracked.png');
+  // Quebrada / Perdeu / broken (3ª imagem: Tela rachada)
+  assert.equal(getTvVisualState(false, 'broken'), '/assets/tv/tv_broken.png');
+  assert.equal(getTvVisualState(true, 'broken'), '/assets/tv/tv_broken.png');
+
+  // Test circuit evaluation for Level E3
+  // 1. Initial state (todos abertos): TV MUST BE OFF, NOT SOLVED!
+  const initialResult = evaluateCircuit(levelE3, { A: false, B: false, C: false, D: false });
+  assert.equal(initialResult.bulbState, false, 'E3 must start with TV OFF');
+  assert.equal(initialResult.isMissionSatisfied, false, 'E3 must NOT be solved initially');
+
+  // 2. Chained Solutions:
+  // Solution 1: A=0, B=1, C=1, D=0 (A!=B, B==C, C!=D)
+  const sol1 = evaluateCircuit(levelE3, { A: false, B: true, C: true, D: false });
+  assert.equal(sol1.bulbState, true, 'Solution 1 (0,1,1,0) must turn on TV');
+  assert.equal(sol1.isMissionSatisfied, true, 'Solution 1 must satisfy mission');
+
+  // Solution 2: A=1, B=0, C=0, D=1 (A!=B, B==C, C!=D)
+  const sol2 = evaluateCircuit(levelE3, { A: true, B: false, C: false, D: true });
+  assert.equal(sol2.bulbState, true, 'Solution 2 (1,0,0,1) must turn on TV');
+  assert.equal(sol2.isMissionSatisfied, true, 'Solution 2 must satisfy mission');
+
+  // 3. Invalid states must keep TV OFF:
+  assert.equal(evaluateCircuit(levelE3, { A: true, B: true, C: true, D: true }).isMissionSatisfied, false);
+  assert.equal(evaluateCircuit(levelE3, { A: true, B: true, C: false, D: false }).isMissionSatisfied, false);
+  assert.equal(evaluateCircuit(levelE3, { A: false, B: true, C: false, D: true }).isMissionSatisfied, false);
+});
+
 
 
